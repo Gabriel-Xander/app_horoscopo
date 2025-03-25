@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "157563725722",
+    "project_id": "horoscopo-app-5b774",
+    "storage_bucket": "horoscopo-app-5b774.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:157563725722:android:fef8dad7712aa1be1f7c23",
+        "android_client_info": {
+          "package_name": "com.example.horoscopo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKul0UblGzfpVjcIlG4Nlspwb8buiUx7g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
