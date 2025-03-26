@@ -97,17 +97,41 @@ class HoroscopoHomePage extends StatefulWidget {
 }
 
 class _HoroscopoHomePageState extends State<HoroscopoHomePage> {
+  String? horoscopoDoDia;
+  String? signoSelecionado;
+
   @override
   void initState() {
     super.initState();
-    // _requestNotificationPermission();
     _initFirebaseMessaging();
+    _gerarHoroscopoDoDia();
+  }
+
+  void _gerarHoroscopoDoDia() {
+    final hoje = DateTime.now();
+    final indice = hoje.day % signos.length;
+    setState(() {
+      signoSelecionado = signos[indice]['nome'];
+      horoscopoDoDia = signos[indice]['descricao'];
+    });
   }
 
   void _initFirebaseMessaging() {
-    FirebaseMessaging.instance.getToken();
+    FirebaseMessaging.instance.getToken().then((token) {
+      print('Token do dispositivo: $token');
+    });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {});
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Mensagem recebida: ${message.messageId}');
+      if (message.notification != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message.notification!.body ?? ''),
+            backgroundColor: Colors.deepPurple,
+          ),
+        );
+      }
+    });
   }
 
   @override
@@ -127,46 +151,81 @@ class _HoroscopoHomePageState extends State<HoroscopoHomePage> {
           centerTitle: true,
           backgroundColor: Colors.deepPurple,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: ListView.builder(
-            itemCount: signos.length,
-            itemBuilder: (context, index) {
-              return Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                color: Colors.white.withOpacity(0.9),
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.deepPurple.shade100,
-                    child: Text(
-                      signos[index]['nome']![0],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+        body: Column(
+          children: [
+            if (horoscopoDoDia != null && signoSelecionado != null)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  color: Colors.white.withOpacity(0.9),
+                  elevation: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Horóscopo do Dia - $signoSelecionado',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          horoscopoDoDia!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
                     ),
                   ),
-                  title: Text(
-                    signos[index]['nome']!,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                  trailing: const Icon(Icons.arrow_forward_ios_rounded),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => SignoDetalhePage(
-                          nomeSigno: signos[index]['nome']!,
-                          descricaoSigno: signos[index]['descricao']!,
+                ),
+              ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: signos.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    color: Colors.white.withOpacity(0.9),
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.deepPurple.shade100,
+                        child: Text(
+                          signos[index]['nome']![0],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+                      title: Text(
+                        signos[index]['nome']!,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios_rounded),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SignoDetalhePage(
+                              nomeSigno: signos[index]['nome']!,
+                              descricaoSigno: signos[index]['descricao']!,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
